@@ -794,6 +794,8 @@ class FormHelper extends AppHelper {
 			$options['maxlength'] = array_sum(explode(',', $fieldDef['length']))+1;
 		}		$divOptions = array();
 		$div = $this->_extractOption('div', $options, true);
+		
+				
 		unset($options['div']);
 
 		if (!empty($div)) {
@@ -801,7 +803,11 @@ class FormHelper extends AppHelper {
 				$div['class'] = 'control-group '.$div['class'];
 			} else {
 				$divOptions['class'] = 'control-group ';
+//				debug($divOptions);
+//				debug($options);
+
 			}
+			
 			$divOptions = $this->addClass($divOptions); // (control-group)
 			
 			if (is_string($div)) {	
@@ -889,7 +895,17 @@ class FormHelper extends AppHelper {
 			break;
 			case 'text':
 			case 'password':
+//			if(isset($options['prepend']))
+//			{
+//								$input = $this->Html->div('',$this->{$type}($fieldName, $options));
+//				//$prepend = $this->Html->div('');
+////				debug($prepend);
+////				$input = $this->{$type}($fieldName, $options);	
+//			}
+//			else
+//			{
 				$input = $this->{$type}($fieldName, $options);
+//			}
 			break;
 				
 			case 'file':
@@ -1158,12 +1174,45 @@ class FormHelper extends AppHelper {
 	function text($fieldName, $options = array()) {
 			$options = $this->_initInputField($fieldName, array_merge(
 			array('type' => 'text'), $options
-		));
-		return sprintf(
-			$this->Html->div('controls',$this->Html->tags['input']),
-			$options['name'],
-			$this->_parseAttributes($options, array('name'), null, ' ')
-		);
+		));		
+		
+		if((isset($options['prepend'])) && (isset($options['append']))) 
+		{
+			return sprintf(
+				$this->Html->div('controls',$this->Html->div('input-prepend input-append',$this->Html->tag('span',$options['prepend'],array('class'=>'add-on')).$this->Html->tags['input'].$this->Html->tag('span',$options['append'],array('class'=>'add-on')))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
+		elseif(isset($options['prepend']))
+		{
+			return sprintf(
+				$this->Html->div('controls',$this->Html->div('input-prepend',$this->Html->tag('span',$options['prepend'],array('class'=>'add-on')).$this->Html->tags['input'])),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
+		elseif(isset($options['append']))
+		{
+			return sprintf(
+				$this->Html->div('controls',$this->Html->div('input-append',$this->Html->tags['input'].$this->Html->tag('span',$options['append'],array('class'=>'add-on')))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
+		else
+		{
+				return sprintf(
+				$this->Html->div('controls',$this->Html->tags['input']),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
+		
+//		if(isset($options['prepend']))
+//		{
+//			echo "FACEBOOK";	
+//		}
 	}
 
 /**
