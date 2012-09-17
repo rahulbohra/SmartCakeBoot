@@ -1200,12 +1200,20 @@ class FormHelper extends AppHelper {
 				$this->_parseAttributes($options, array('name'), null, ' ')
 			);
 		}
+		elseif(isset($options['help-block']))
+		{
+				return sprintf(
+				$this->Html->div('controls',$this->Html->tags['input'].$this->Html->tag('span',$options['help-block'],array('class'=>'help-block'))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
 		else
 		{
 				return sprintf(
 				$this->Html->div('controls',$this->Html->tags['input']),
 				$options['name'],
-				$this->_parseAttributes($options, array('name'), null, ' ')
+				$this->_parseAttributes($options, array('name'), null, ' ')	
 			);
 		}
 		
