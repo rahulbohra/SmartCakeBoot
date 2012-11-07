@@ -561,9 +561,12 @@ class FormHelper extends AppHelper {
 			}
 			$text = __(Inflector::humanize(Inflector::underscore($text)), true);
 		}
+		
+		if(!isset($options['class']))
+			$options['class'] = 'control-label';
 
 		if (is_string($options)) {
-			$options = array('class' => 'control-label');
+			$options = array('class' => $options);
 		}
 
 		if (isset($options['for'])) {
@@ -740,7 +743,7 @@ class FormHelper extends AppHelper {
 				$type = $fieldDef['type'];
 				$primaryKey = $this->fieldset[$modelKey]['key'];
 			}
-
+			
 			if (isset($type)) {
 				$map = array(
 					'string'  => 'text',     'datetime'  => 'datetime',
@@ -748,7 +751,7 @@ class FormHelper extends AppHelper {
 					'text'    => 'textarea', 'time'      => 'time',
 					'date'    => 'date',     'float'     => 'text'
 				);
-
+				
 				if (isset($this->map[$type])) {
 					$options['type'] = $this->map[$type];
 				} elseif (isset($map[$type])) {
@@ -794,8 +797,7 @@ class FormHelper extends AppHelper {
 			$options['maxlength'] = array_sum(explode(',', $fieldDef['length']))+1;
 		}		$divOptions = array();
 		$div = $this->_extractOption('div', $options, true);
-		
-				
+
 		unset($options['div']);
 
 		if (!empty($div)) {
@@ -895,17 +897,7 @@ class FormHelper extends AppHelper {
 			break;
 			case 'text':
 			case 'password':
-//			if(isset($options['prepend']))
-//			{
-//								$input = $this->Html->div('',$this->{$type}($fieldName, $options));
-//				//$prepend = $this->Html->div('');
-////				debug($prepend);
-////				$input = $this->{$type}($fieldName, $options);	
-//			}
-//			else
-//			{
 				$input = $this->{$type}($fieldName, $options);
-//			}
 			break;
 				
 			case 'file':
@@ -914,10 +906,24 @@ class FormHelper extends AppHelper {
 			case 'select':
 				$options += array('options' => array());
 				$list = $options['options'];
-				array_unshift($list, "Select");
+				//array_unshift($list, "Select");
 				unset($options['options']);
-
-				$input = $this->Html->div('controls',$this->select($fieldName, $list, $selected, $options));
+				if(isset($options['help-block']))
+				{
+					$optionsSelect = $options;
+					unset($optionsSelect['help-block']);
+					$input = $this->Html->div('controls',$this->select($fieldName, $list, $selected, $options).$this->Html->tag('span',$options['help-block'],array('class'=>'help-block')),
+					$optionsSelect,	
+					$this->_parseAttributes($options, array('name'), null, ' '));				
+				}
+				elseif(isset($options['leg']))
+				{
+					$input = $this->select($fieldName, $list, $selected, $options);
+				}
+				else
+				{
+					$input = $this->Html->div('controls',$this->select($fieldName, $list, $selected, $options));
+				}
 			break;
 			case 'time':
 				$input = $this->dateTime($fieldName, null, $timeFormat, $selected, $options);
@@ -942,7 +948,22 @@ class FormHelper extends AppHelper {
 			break;
 			case 'textarea':
 			default:
-				$input = $this->textarea($fieldName, $options + array('cols' => '30', 'rows' => '6'));
+				if(isset($options['help-block']))
+				{
+					$optionsTextarea = $options;
+					unset($optionsTextarea['help-block']);
+					
+					$input = $this->Html->div('controls',
+						$this->textarea($fieldName, $options + array('cols' => '30', 'rows' => '3')).$this->Html->tag('span',$options['help-block'],
+						array('class'=>'help-block')),
+						$optionsTextarea,	
+						$this->_parseAttributes($options, array('name'), null, ' ')
+					);				
+				}
+				else
+				{
+					$input = $this->Html->div('controls',$this->textarea($fieldName, $options + array('cols' => '30', 'rows' => '3')));
+				}
 			break;
 		}
 
@@ -1038,7 +1059,6 @@ class FormHelper extends AppHelper {
 		$options = $this->_initInputField($fieldName, $options) + array('hiddenField' => true);
 		$value = current($this->value());
 		$output = "";
-
 		if (empty($options['value'])) {
 			$options['value'] = 1;
 		} elseif (
@@ -1058,12 +1078,22 @@ class FormHelper extends AppHelper {
 			$output = $this->hidden($fieldName, $hiddenOptions);
 		}
 		unset($options['hiddenField']);
-
-		return $output . sprintf(
-			$this->Html->div('controls',$this->label('',$this->Html->tags['checkbox'],array('class'=>'checkbox'))),
-			$options['name'],
-			$this->_parseAttributes($options, array('name'), null, ' ')
-		);
+		if(isset($options['help-block']))
+		{
+				return sprintf(
+				$this->Html->div('control-group',$this->Html->div('controls',$this->label('',$this->Html->tags['checkbox'],array('class'=>'checkbox')).$this->Html->tag('span',$options['help-block'],array('class'=>'help-block')))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
+		else
+		{
+				return $output . sprintf(
+				$this->Html->div('control-group',$this->Html->div('controls',$this->label('', $this->Html->tags['checkbox'], array('class'=>'checkbox')))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
 	}
 
 /**
@@ -1089,7 +1119,14 @@ class FormHelper extends AppHelper {
 	function radio($fieldName, $options = array(), $attributes = array()) {
 		$attributes = $this->_initInputField($fieldName, $attributes);
 		$legend = false;
-
+		if(isset($options['help-block']))
+		{
+				return sprintf(
+				$this->Html->div('controls',$this->Html->tags['input'].$this->Html->tag('span',$options['help-block'],array('class'=>'help-block'))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
 		if (isset($attributes['legend'])) {
 			$legend = $attributes['legend'];
 			unset($attributes['legend']);
@@ -1208,6 +1245,14 @@ class FormHelper extends AppHelper {
 				$this->_parseAttributes($options, array('name'), null, ' ')
 			);
 		}
+		elseif(isset($options['leg']))
+		{
+				return sprintf(
+				$this->Html->tags['input'],
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
 		else
 		{
 				return sprintf(
@@ -1216,11 +1261,6 @@ class FormHelper extends AppHelper {
 				$this->_parseAttributes($options, array('name'), null, ' ')	
 			);
 		}
-		
-//		if(isset($options['prepend']))
-//		{
-//			echo "FACEBOOK";	
-//		}
 	}
 
 /**
@@ -1234,6 +1274,14 @@ class FormHelper extends AppHelper {
  */
 	function password($fieldName, $options = array()) {
 		$options = $this->_initInputField($fieldName, $options);
+		if(isset($options['help-block']))
+		{
+				return sprintf(
+				$this->Html->div('controls',$this->Html->tags['input'].$this->Html->tag('span',$options['help-block'],array('class'=>'help-block'))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
 		return sprintf(
 			$this->Html->div('controls',$this->Html->tags['password']),
 			$options['name'],
@@ -1257,16 +1305,17 @@ class FormHelper extends AppHelper {
 	function textarea($fieldName, $options = array()) {
 		$options = $this->_initInputField($fieldName, $options);
 		$value = null;
-
-		if (array_key_exists('value', $options)) {
+		if (array_key_exists('value', $options))
+		{
 			$value = $options['value'];
-			if (!array_key_exists('escape', $options) || $options['escape'] !== false) {
+			if (!array_key_exists('escape', $options) || $options['escape'] !== false)
+			{
 				$value = h($value);
 			}
 			unset($options['value']);
 		}
 		return sprintf(
-			$this->Html->div('controls',$this->Html->tags['textarea']),
+			$this->Html->tags['textarea'],
 			$options['name'],
 			$this->_parseAttributes($options, array('type', 'name'), null, ' '),
 			$value
@@ -1319,7 +1368,14 @@ class FormHelper extends AppHelper {
 		$options = $this->_initInputField($fieldName, $options);
 		$view =& ClassRegistry::getObject('view');
 		$field = $view->entity();
-
+		if(isset($options['help-block']))
+		{
+				return sprintf(
+				$this->Html->div('controls',$this->Html->tags['input'].$this->Html->tag('span',$options['help-block'],array('class'=>'help-block'))),
+				$options['name'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		}
 		foreach (array('name', 'type', 'tmp_name', 'error', 'size') as $suffix) {
 			$this->__secure(array_merge($field, array($suffix)));
 		}
@@ -1343,16 +1399,27 @@ class FormHelper extends AppHelper {
  * @link http://book.cakephp.org/view/1415/button
  */
 	function button($title, $options = array()) {
-		$options += array('type' => 'submit', 'escape' => false, 'class'=>'btn btn-primary');
+		isset($options['class']) ? $options['class'] = 'btn '.$options['class'] :  $options['class'] = 'btn ';
+		
+		$options += array('type' => 'submit', 'escape' => false);
 		if ($options['escape']) {
 			$title = h($title);
 		}
-		return sprintf(
-			$this->Html->div('',$this->Html->tags['button'], array('class'=>'form-actions')),
-			$options['type'],
-			$this->_parseAttributes($options, array('type'), array('class'=>'btn btn-primary'), ''),
-			$title
-		);
+		if(isset($options['help-block']))
+		{
+				return sprintf(
+				$this->Html->div('controls',$this->Html->tags['input'].$this->Html->tag('span',$options['help-block'],array('class'=>'help-block'))),
+				$options['type'],
+				$this->_parseAttributes($options, array('name'), null, ' ')
+			);
+		} else {
+			return sprintf(
+				$this->Html->tags['button'],
+				$options['type'],
+				$this->_parseAttributes($options, array('name'), null, ' '),
+				$title
+			);
+		}
 	}
 
 /**
@@ -1435,7 +1502,7 @@ class FormHelper extends AppHelper {
 		} else {
 			$options['value'] = $caption;
 			$out .= $before . sprintf(
-				$this->Html->tags['submit'],
+				$this->Html->tags['submit'].$this->button('Reset', array('type'=>'reset')),
 				$this->_parseAttributes($options, null, '', ' ')
 			). $after;
 		}
@@ -1444,7 +1511,7 @@ class FormHelper extends AppHelper {
 			$tag = $divOptions['tag'];
 			unset($divOptions['tag']);
 			$out = $this->Html->tag($tag, $out, $divOptions);
-		}
+		}			
 		return $out;
 	}
 
@@ -1509,7 +1576,6 @@ class FormHelper extends AppHelper {
 			'showParents' => false,
 			'hiddenField' => true
 		);
-
 		$escapeOptions = $this->_extractOption('escape', $attributes);
 		$secure = $this->_extractOption('secure', $attributes);
 		$showEmpty = $this->_extractOption('empty', $attributes);
@@ -1884,6 +1950,7 @@ class FormHelper extends AppHelper {
 				$selected = null;
 			}
 		}
+		
 
 		if ($selected === null && $attributes['empty'] != true) {
 			$selected = time();
@@ -2015,6 +2082,15 @@ class FormHelper extends AppHelper {
 				$opt .= '';
 			break;
 		}
+						if(isset($options['help-block']))
+				{
+						return sprintf(
+						$this->Html->div('controls',$this->Html->tags['input'].$this->Html->tag('span',$options['help-block'],array('class'=>'help-block'))),
+						$options,
+						$this->_parseAttributes($options, array('name'), null, ' ')
+					);
+				}
+
 		return $opt;
 	}
 
@@ -2191,6 +2267,8 @@ class FormHelper extends AppHelper {
 			case 'meridian':
 				$data = array('am' => 'am', 'pm' => 'pm');
 			break;
+
+
 			case 'day':
 				$min = 1;
 				$max = 31;

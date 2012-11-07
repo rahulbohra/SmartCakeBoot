@@ -41,7 +41,7 @@
 </div>
 </div>
 <div class="span9">
-<?php echo "<?php echo \$this->Form->create('{$modelClass}');?>\n";?>
+<?php echo "<?php echo \$this->Form->create('{$modelClass}',array('class'=>'form-horizontal'));?>\n";?>
 	<fieldset>
 		<legend><?php printf("<?php __('%s %s'); ?>", Inflector::humanize($action), $singularHumanName); ?></legend>
 <?php
