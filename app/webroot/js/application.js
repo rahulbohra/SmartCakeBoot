@@ -6,9 +6,58 @@
 
   $(function(){
 
+    var $window = $(window)	
+		  
+  <!-- Personlize scripts starts -->
+	// adds date picker
+	$(".date").datepicker({
+	   "dateFormat":'yy-mm-dd',
+	   changeMonth: true,
+	   changeYear: true
+	});
+	
+	var validator = $("form").validate();
+	$("button[type=reset]").click(function() {
+		validator.resetForm();
+	});
+
+	// replace string in currency format
+	$(".amount").blur( function() {
+		var value = $(this).val().toLowerCase();
+		$(this).val(value.replace("k","000").replace("m","000000").replace("b","000000000"));
+	});
+	
+	$('.currencyPair').change(function() {
+		var element1 = $(':selected', this).text().substring(0,3);
+		var element2 = $(':selected', this).text().substring(3,7);
+		$(".amountCurrency").html("<option>"+element1+"</option>"+"<option>"+element2+"</option>").trigger('change');
+	});	
+	
+	$('.amountCurrency').change( function() {
+		var curSymbol = new Array()
+		if($(this).val() == 'USD') $('.currencySymbol').text('$');
+		if($(this).val() == 'INR') $('.currencySymbol').text('Rs');
+		if($(this).val() == 'GBP') $('.currencySymbol').html('&pound;');
+		if($(this).val() == 'JPY') $('.currencySymbol').html('&yen;');
+		if($(this).val() == 'EUR') $('.currencySymbol').html('&euro;');
+		if($(this).val() == 'CAD') $('.currencySymbol').html('C$');
+	});
+
+
+
+  <!-- Personlize scripts ends -->
+
     // Disable certain links in docs
     $('section [href^=#]').click(function (e) {
       e.preventDefault()
+    })
+
+    // side bar
+    $('.bs-docs-sidenav').affix({
+      offset: {
+        top: function () { return $window.width() <= 980 ? 290 : 210 }
+      , bottom: 270
+      }
     })
 
     // make code pretty
@@ -21,56 +70,16 @@
       $(this).parents('.add-on')[method]('active')
     })
 
-    // position static twipsies for components page
-    if ($(".twipsies a").length) {
-      $(window).on('load resize', function () {
-        $(".twipsies a").each(function () {
-          $(this)
-            .tooltip({
-              placement: $(this).attr('title')
-            , trigger: 'manual'
-            })
-            .tooltip('show')
-          })
-      })
-    }
-
     // add tipsies to grid for scaffolding
-    if ($('#grid-system').length) {
-      $('#grid-system').tooltip({
+    if ($('#gridSystem').length) {
+      $('#gridSystem').tooltip({
           selector: '.show-grid > div'
         , title: function () { return $(this).width() + 'px' }
       })
     }
 
-    // fix sub nav on scroll
-    var $win = $(window)
-      , $nav = $('.subnav')
-      , navTop = $('.subnav').length && $('.subnav').offset().top - 40
-      , isFixed = 0
-
-    processScroll()
-
-    // hack sad times - holdover until rewrite for 2.1
-    $nav.on('click', function () {
-      if (!isFixed) setTimeout(function () {  $win.scrollTop($win.scrollTop() - 47) }, 10)
-    })
-
-    $win.on('scroll', processScroll)
-
-    function processScroll() {
-      var i, scrollTop = $win.scrollTop()
-      if (scrollTop >= navTop && !isFixed) {
-        isFixed = 1
-        $nav.addClass('subnav-fixed')
-      } else if (scrollTop <= navTop && isFixed) {
-        isFixed = 0
-        $nav.removeClass('subnav-fixed')
-      }
-    }
-
     // tooltip demo
-    $('.tooltip-demo.well').tooltip({
+    $('.tooltip-demo').tooltip({
       selector: "a[rel=tooltip]"
     })
 
