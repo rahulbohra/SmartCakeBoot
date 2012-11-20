@@ -1,0 +1,1 @@
+Please delete me, this file is created because it is stored under "tmp" folder, which is intially is empty (but required in cakephp framework in order to cache the files), and Github Repo, does not allow empty folder to get uploaded, although it won`t make any differences, but make increase your file size.
