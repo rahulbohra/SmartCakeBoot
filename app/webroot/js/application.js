@@ -16,6 +16,22 @@
 	   changeYear: true
 	});
 	
+	$('.time').timepicker({
+		timeFormat: 'HH:mm:ss',
+		showSecond:true,
+	});
+
+	$('.datetime').datetimepicker({
+	   "dateFormat":'yy-mm-dd',
+		changeMonth: true,
+		changeYear: true,
+		showSecond: true,
+		timeFormat: 'HH:mm:ss',
+		stepHour: 2,
+		stepMinute: 10,
+		stepSecond: 10
+	});
+	
 	var validator = $("form").validate();
 	$("button[type=reset]").click(function() {
 		validator.resetForm();

@@ -25,7 +25,7 @@ echo $this->Html->script(array("jquery"));
 </div>
 <?php echo $this->element('sql_dump'); ?>
 <?php
-        echo $this->Html->script(array("google-code-prettify", 'bootstrap-affix', 'bootstrap-transition', "bootstrap-alert", "bootstrap-modal", "bootstrap-dropdown", "bootstrap-scrollspy", "bootstrap-tab", "bootstrap-tab", "bootstrap-tooltip", "bootstrap-popover", "bootstrap-button", "bootstrap-carousel", "bootstrap-typeahead","application", "bootstrap-collapse","validate", 'jquery.validate.additional-methods',"jquery.form","jquery-ui.min", 'date'));
+        echo $this->Html->script(array("google-code-prettify", 'bootstrap-affix', 'bootstrap-transition', "bootstrap-alert", "bootstrap-modal", "bootstrap-dropdown", "bootstrap-scrollspy", "bootstrap-tab", "bootstrap-tab", "bootstrap-tooltip", "bootstrap-popover", "bootstrap-button", "bootstrap-carousel", "bootstrap-typeahead","application", "bootstrap-collapse","validate", 'jquery.validate.additional-methods',"jquery.form","jquery-ui.min", 'date','jquery-ui-timepicker-addon','jquery-ui-sliderAccess'));
 		echo $scripts_for_layout;
 
     ?>
