@@ -1253,6 +1253,22 @@ class FormHelper extends AppHelper {
 				$this->_parseAttributes($options, array('name'), null, ' ')
 			);
 		}
+		 elseif(isset($options['appendBtn']))
+		   {
+			   return sprintf(
+					   $this->Html->div('controls',$this->Html->div('input-append',$this->Html->tags['input'].$this->Html->tag('a',$options['appendBtn'],array('class'=>'btn', 'id'=>$fieldName.'Btn')))),
+					   $options['name'],
+					   $this->_parseAttributes($options, array('name'), null, ' ')
+			   );
+		   }
+		   elseif(isset($options['prependBtn']))
+		   {
+			   return sprintf(
+					   $this->Html->div('controls',$this->Html->div('input-prepend',$this->Html->tag('a',$options['prependBtn'],array('class'=>'btn', 'id'=>$fieldName.'Btn')).$this->Html->tags['input'])),
+					   $options['name'],
+					   $this->_parseAttributes($options, array('name'), null, ' ')
+			   );
+		   }
 		else
 		{
 				return sprintf(
