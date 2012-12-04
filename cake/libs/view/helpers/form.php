@@ -1518,7 +1518,7 @@ class FormHelper extends AppHelper {
 		} else {
 			$options['value'] = $caption;
 			$out .= $before . sprintf(
-				$this->Html->tags['submit'].$this->button('Reset', array('type'=>'reset')),
+				$this->Html->tags['submit'].' '.$this->button('Reset', array('type'=>'reset')),
 				$this->_parseAttributes($options, null, '', ' ')
 			). $after;
 		}
